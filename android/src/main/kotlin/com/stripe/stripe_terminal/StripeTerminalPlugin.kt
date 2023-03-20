@@ -565,7 +565,15 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
             ContextCompat.checkSelfPermission(currentActivity!!, it)
         }
         if (!permissionStatus.contains(PackageManager.PERMISSION_DENIED)) {
-            _startStripe()
+            try {
+                _startStripe()
+            }catch (e: Exception){
+                result?.error(
+                    "stripeTerminal#unableToStart",
+                    "Unable to start the stripe terminal because ${e.message}",
+                    e.stackTraceToString()
+                )
+            }
         } else {
             result?.error(
                 "stripeTerminal#insuffecientPermission",
