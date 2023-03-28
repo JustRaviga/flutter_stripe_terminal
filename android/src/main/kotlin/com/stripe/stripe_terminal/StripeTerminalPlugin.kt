@@ -74,16 +74,24 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
 
     fun _startStripe() {
         // Pass in the current application context, your desired logging level, your token provider, and the listener you created
-        if (!Terminal.isInitialized()) {
-            Terminal.initTerminal(
-                currentActivity!!.applicationContext,
-                logLevel,
-                tokenProvider,
-                listener
-            )
-            result?.success(true)
-        }
 
+        try {
+            if (!Terminal.isInitialized()) {
+                Terminal.initTerminal(
+                    currentActivity!!.applicationContext,
+                    logLevel,
+                    tokenProvider,
+                    listener
+                )
+                result?.success(true)
+            }
+        }catch (e: Exception){
+            result?.error(
+                "stripeTerminal#unableToStartStripe",
+                "Unable to start the stripe terminal because ${e.message}",
+                e.stackTraceToString()
+            )
+        }
     }
 
     private fun generateLog(code: String, message: String) {
