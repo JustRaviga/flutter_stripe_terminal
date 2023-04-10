@@ -595,6 +595,10 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        if(!Terminal.isInitialized()){
+            return;
+        }
+
         if (Terminal.getInstance().connectedReader != null) {
             Terminal.getInstance().disconnectReader(object : Callback {
                 override fun onFailure(e: TerminalException) {
