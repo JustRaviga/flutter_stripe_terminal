@@ -353,8 +353,9 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                             reader,
                             connectionConfig,
                             object : BluetoothReaderListener {
-
-
+                                override fun onReportReaderSoftwareUpdateProgress(progress: Float) {
+                                    channel.invokeMethod("onReportReaderSoftwareUpdateProgress", progress)
+                                }
                             },
                             object : ReaderCallback {
                                 override fun onFailure(e: TerminalException) {
@@ -700,8 +701,6 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         TODO("Not yet implemented")
     }
-
-
 }
 
 

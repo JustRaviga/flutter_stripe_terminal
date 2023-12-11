@@ -40,6 +40,10 @@ class StripeTerminal {
             readers.map<StripeReader>((e) => StripeReader.fromJson(e)).toList(),
           );
           return _fetchToken();
+        case "onReportReaderSoftwareUpdateProgress":
+          double progress = call.arguments;
+
+          return progress;
         default:
           return null;
       }
@@ -60,8 +64,7 @@ class StripeTerminal {
   }
 
   /// Stream controller for the logs coming from the native platform
-  final StreamController<StripeLog> _logsStreamController =
-      StreamController<StripeLog>();
+  final StreamController<StripeLog> _logsStreamController = StreamController<StripeLog>();
 
   /// Gives you the native logs of this plugin. If some features are not working for you,
   /// you can listen to the native logs to understand whats going wrong.
@@ -82,8 +85,7 @@ class StripeTerminal {
     /// Either you have to provide a location here or the device should already be registered to a location
     String? locationId,
   }) async {
-    bool? connected =
-        await _channel.invokeMethod<bool?>("connectBluetoothReader", {
+    bool? connected = await _channel.invokeMethod<bool?>("connectBluetoothReader", {
       "locationId": locationId,
       "readerSerialNumber": readerSerialNumber,
     });
@@ -107,8 +109,7 @@ class StripeTerminal {
 
     String? locationId,
   }) async {
-    bool? connected =
-        await _channel.invokeMethod<bool?>("connectBluetoothReader", {
+    bool? connected = await _channel.invokeMethod<bool?>("connectBluetoothReader", {
       "locationId": locationId,
       "readerSerialNumber": readerSerialNumber,
     });
@@ -129,8 +130,7 @@ class StripeTerminal {
     /// Weather the connection process should fail if the device is already in use
     bool failIfInUse = false,
   }) async {
-    bool? connected =
-        await _channel.invokeMethod<bool?>("connectToInternetReader", {
+    bool? connected = await _channel.invokeMethod<bool?>("connectToInternetReader", {
       "failIfInUse": failIfInUse,
       "readerSerialNumber": readerSerialNumber,
     });
@@ -145,8 +145,7 @@ class StripeTerminal {
   ///
   /// Always run `connectToReader` before calling this function
   Future<bool> disconnectFromReader() async {
-    bool? disconnected =
-        await _channel.invokeMethod<bool?>("disconnectFromReader");
+    bool? disconnected = await _channel.invokeMethod<bool?>("disconnectFromReader");
     if (disconnected == null) {
       throw Exception("Unable to disconnect from the reader");
     } else {
@@ -178,6 +177,16 @@ class StripeTerminal {
       throw Exception("Unable to get connection status");
     } else {
       return ConnectionStatus.values[statusId];
+    }
+  }
+
+  // /// Check the reader software update process
+  Future<double> readerSoftwareUpdateProgress() async {
+    double? progress = await _channel.invokeMethod<double>("onReportReaderSoftwareUpdateProgress");
+    if (progress == null) {
+      throw Exception("Unable to get reader software update progress");
+    } else {
+      return Future.value(progress);
     }
   }
 
