@@ -109,6 +109,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                     _startStripe()
                 }
             }
+
             "clearReaderDisplay" -> {
                 Terminal.getInstance().clearReaderDisplay(object : Callback {
                     override fun onFailure(e: TerminalException) {
@@ -369,7 +370,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                                     cancelable: Cancelable
                                 ) {
                                     currentActivity?.runOnUiThread {
-                                        generateLog("reportReaderSoftwareUpdateStarted");
+                                        generateLog("reportReaderSoftwareUpdateStarted", message = 'Reader software update started');
                                     }
                                 }
 
@@ -379,9 +380,12 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                                     }
                                 }
 
-                                override fun onFinishInstallingUpdate(update: ReaderSoftwareUpdate?, e: TerminalException?) {
+                                override fun onFinishInstallingUpdate(
+                                    update: ReaderSoftwareUpdate?,
+                                    e: TerminalException?
+                                ) {
                                     currentActivity?.runOnUiThread {
-                                        generateLog("reportReaderSoftwareUpdateFinished");
+                                        generateLog("reportReaderSoftwareUpdateFinished", message = 'Reader software update finished');
                                     }
                                 }
                             },
