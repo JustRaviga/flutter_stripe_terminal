@@ -85,7 +85,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                 )
                 result?.success(true)
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             result?.error(
                 "stripeTerminal#unableToStartStripe",
                 "Unable to start the stripe terminal because ${e.message}",
@@ -110,19 +110,21 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                 }
             }
             "clearReaderDisplay" -> {
-                Terminal.getInstance().clearReaderDisplay(object :Callback{
+                Terminal.getInstance().clearReaderDisplay(object : Callback {
                     override fun onFailure(e: TerminalException) {
                         return result.error(
                             "stripeTerminal#unableToClearDisplay",
                             e.errorMessage,
                             e.stackTraceToString()
-                        )                    }
+                        )
+                    }
 
                     override fun onSuccess() {
                         result.success(true)
                     }
                 })
             }
+
             "setReaderDisplay" -> {
                 val arguments = call.arguments as HashMap<*, *>
                 val rawReaderDisplay = arguments["readerDisplay"] as HashMap<*, *>
@@ -160,6 +162,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                     }
                 })
             }
+
             "discoverReaders#start" -> {
                 val arguments = call.arguments as HashMap<*, *>
                 val discoverConfig = arguments["config"] as HashMap<*, *>
@@ -212,6 +215,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                         }
                     })
             }
+
             "discoverReaders#stop" -> {
                 if (cancelableDiscover == null) {
                     result.error(
@@ -237,12 +241,15 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
 
                 }
             }
+
             "fetchConnectedReader" -> {
                 result.success(Terminal.getInstance().connectedReader?.rawJson())
             }
+
             "connectionStatus" -> {
                 result.success(handleConnectionStatus(Terminal.getInstance().connectionStatus))
             }
+
             "connectToInternetReader" -> {
                 when (Terminal.getInstance().connectionStatus) {
                     ConnectionStatus.NOT_CONNECTED -> {
@@ -291,6 +298,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
 
                             })
                     }
+
                     ConnectionStatus.CONNECTING -> {
                         result.error(
                             "stripeTerminal#deviceConnecting",
@@ -298,6 +306,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                             null
                         )
                     }
+
                     ConnectionStatus.CONNECTED -> {
                         result.error(
                             "stripeTerminal#deviceAlreadyConnected",
@@ -307,6 +316,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                     }
                 }
             }
+
             "connectBluetoothReader" -> {
                 when (Terminal.getInstance().connectionStatus) {
                     ConnectionStatus.NOT_CONNECTED -> {
@@ -353,8 +363,26 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                             reader,
                             connectionConfig,
                             object : BluetoothReaderListener {
+
+                                override fun onStartInstallingUpdate(
+                                    update: ReaderSoftwareUpdate,
+                                    cancelable: Cancelable
+                                ) {
+                                    currentActivity?.runOnUiThread {
+                                        generateLog("reportReaderSoftwareUpdateStarted");
+                                    }
+                                }
+
                                 override fun onReportReaderSoftwareUpdateProgress(progress: Float) {
-                                    channel.invokeMethod("onReportReaderSoftwareUpdateProgress", progress)
+                                    currentActivity?.runOnUiThread {
+                                        generateLog("reportReaderSoftwareUpdateProgress", progress.toString())
+                                    }
+                                }
+
+                                override fun onFinishInstallingUpdate(update: ReaderSoftwareUpdate?, e: TerminalException?) {
+                                    currentActivity?.runOnUiThread {
+                                        generateLog("reportReaderSoftwareUpdateFinished");
+                                    }
                                 }
                             },
                             object : ReaderCallback {
@@ -372,6 +400,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
 
                             })
                     }
+
                     ConnectionStatus.CONNECTING -> {
                         result.error(
                             "stripeTerminal#deviceConnecting",
@@ -379,6 +408,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                             null
                         )
                     }
+
                     ConnectionStatus.CONNECTED -> {
                         result.error(
                             "stripeTerminal#deviceAlreadyConnected",
@@ -388,6 +418,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                     }
                 }
             }
+
             "readReusableCardDetail" -> {
                 generateLog("readReusableCardDetail", "Started reading payment method")
 
@@ -415,6 +446,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                     })
                 }
             }
+
             "collectPaymentMethod" -> {
                 generateLog("collectPaymentMethod", "Started reading payment method")
 
@@ -505,6 +537,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                             })
                 }
             }
+
             "disconnectFromReader" -> {
                 if (Terminal.getInstance().connectedReader != null) {
                     Terminal.getInstance().disconnectReader(object : Callback {
@@ -528,6 +561,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                     )
                 }
             }
+
             else -> result.notImplemented()
         }
 
@@ -576,7 +610,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
         if (!permissionStatus.contains(PackageManager.PERMISSION_DENIED)) {
             try {
                 _startStripe()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 result?.error(
                     "stripeTerminal#unableToStart",
                     "Unable to start the stripe terminal because ${e.message}",
@@ -596,7 +630,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
-        if(Terminal.isInitialized()){
+        if (Terminal.isInitialized()) {
             if (Terminal.getInstance().connectedReader != null) {
                 Terminal.getInstance().disconnectReader(object : Callback {
                     override fun onFailure(e: TerminalException) {

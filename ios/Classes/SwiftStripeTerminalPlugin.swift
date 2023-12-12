@@ -61,6 +61,7 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin, DiscoveryDelega
                     )
                 }
             }
+
         case "setReaderDisplay":
             do {
                 let arguments = call.arguments as! Dictionary<String, Any>
@@ -443,19 +444,19 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin, DiscoveryDelega
     }
     
     public func reader(_ reader: Reader, didReportAvailableUpdate update: ReaderSoftwareUpdate) {
-        
+
     }
     
     public func reader(_ reader: Reader, didStartInstallingUpdate update: ReaderSoftwareUpdate, cancelable: Cancelable?) {
-        
+        self.generateLog(code: "reportReaderSoftwareUpdateStarted", message: "Reader software update started");
     }
     
     public func reader(_ reader: Reader, didReportReaderSoftwareUpdateProgress progress: Float) {
-        
+        self.generateLog(code: "reportReaderSoftwareUpdateProgress",  message: "\(progress)")
     }
     
     public func reader(_ reader: Reader, didFinishInstallingUpdate update: ReaderSoftwareUpdate?, error: Error?) {
-        
+        self.generateLog(code: "reportReaderSoftwareUpdateFinished", message: "Reader software update finished");
     }
     
     public func reader(_ reader: Reader, didRequestReaderInput inputOptions: ReaderInputOptions = []) {

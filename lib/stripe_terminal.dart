@@ -180,16 +180,6 @@ class StripeTerminal {
     }
   }
 
-  // /// Check the reader software update process
-  Future<double> readerSoftwareUpdateProgress() async {
-    double? progress = await _channel.invokeMethod<double>("onReportReaderSoftwareUpdateProgress");
-    if (progress == null) {
-      throw Exception("Unable to get reader software update progress");
-    } else {
-      return Future.value(progress);
-    }
-  }
-
   /// Fetches the connected reader from the SDK. `null` if not connected
   Future<StripeReader?> fetchConnectedReader() async {
     Map? reader = await _channel.invokeMethod<Map>("fetchConnectedReader");
