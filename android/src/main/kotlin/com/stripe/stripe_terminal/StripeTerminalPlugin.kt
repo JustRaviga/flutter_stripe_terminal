@@ -365,15 +365,6 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                             connectionConfig,
                             object : BluetoothReaderListener {
 
-                                override fun onStartInstallingUpdate(
-                                    update: ReaderSoftwareUpdate,
-                                    cancelable: Cancelable
-                                ) {
-                                    currentActivity?.runOnUiThread {
-                                        generateLog("reportReaderSoftwareUpdateStarted", message = 'Reader software update started');
-                                    }
-                                }
-
                                 override fun onReportReaderSoftwareUpdateProgress(progress: Float) {
                                     currentActivity?.runOnUiThread {
                                         generateLog("reportReaderSoftwareUpdateProgress", progress.toString())
@@ -385,7 +376,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler,
                                     e: TerminalException?
                                 ) {
                                     currentActivity?.runOnUiThread {
-                                        generateLog("reportReaderSoftwareUpdateFinished", message = 'Reader software update finished');
+                                        generateLog("reportReaderSoftwareUpdateFinished","Reader software update finished");
                                     }
                                 }
                             },
